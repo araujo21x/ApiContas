@@ -1,10 +1,9 @@
 const sequelize = require('./db');
-const {DataTypes} = require('sequelize');
-const querySql = sequelize.getQueryInterface();
+const { DataTypes } = require('sequelize');
 
-module.exports = () =>{
+module.exports = () => {
 
-    querySql.createTable('user', {
+    const User = sequelize.define('User', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -26,13 +25,9 @@ module.exports = () =>{
             type: DataTypes.STRING,
             allowNull: false,
         },
-        dateRegistry: {
-            type: DataTypes.DATE,
-            allowNull: false,
-        },
     });
 
-    querySql.createTable('group',{
+    const Group = sequelize.define('Group', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -46,13 +41,9 @@ module.exports = () =>{
             type: DataTypes.STRING,
             allowNull: false,
         },
-        dateCreated: {
-            type: DataTypes.DATE,
-            allowNull: false,
-        },
     });
 
-    querySql.createTable('userAndgroup',{
+    const UserAndGroup = sequelize.define('UserAndGroup', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -60,8 +51,8 @@ module.exports = () =>{
         },
         fkUser: {
             type: DataTypes.INTEGER,
-            references:{
-                model: 'user',
+            references: {
+                model: 'Users',
                 key: 'id'
             },
             onUpdate: 'cascade',
@@ -69,8 +60,8 @@ module.exports = () =>{
         },
         fkGroup: {
             type: DataTypes.INTEGER,
-            references:{
-                model: 'group',
+            references: {
+                model: 'Groups',
                 key: 'id'
             },
             onUpdate: 'cascade',
@@ -78,25 +69,25 @@ module.exports = () =>{
         },
     });
 
-    querySql.createTable('account',{
+    const Account = sequelize.define('Account', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
         },
-        fkCreateUser:{
+        fkCreateUser: {
             type: DataTypes.INTEGER,
-            references:{
-                model: 'user',
+            references: {
+                model: 'Users',
                 key: 'id'
             },
             onUpdate: 'cascade',
             onDelete: 'cascade',
         },
-        fkgroup:{
+        fkgroup: {
             type: DataTypes.INTEGER,
-            references:{
-                model: 'group',
+            references: {
+                model: 'Groups',
                 key: 'id'
             },
             onUpdate: 'cascade',
@@ -119,7 +110,14 @@ module.exports = () =>{
         belongDate: {
             type: DataTypes.DATE,
         },
-        
     })
+
+    sequelize.sync({ alter: true })
+        .then((result) => {
+            console.log("Sucesso!!!");
+        })
+        .catch((err) => {
+            console.log(err);
+        });
 
 }
