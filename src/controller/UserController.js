@@ -65,7 +65,23 @@ class UserController {
 
     login() {
         return(req, res) => {
-            
+            const User = sequelize.models.User;
+            const err = [];
+
+            User.findAll({
+                where: {
+                    [Op.and]: [
+                        { login: req.body.login },
+                        { password: req.body.password }
+                    ]
+                }
+            })
+            .then((value)=>{
+                res.status(200).json(value);
+            })
+            .catch((err)=>{
+                console.log(err);
+            });
         }
     }
 }
