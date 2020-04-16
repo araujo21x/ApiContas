@@ -1,88 +1,124 @@
-const UserDao = require('../models/UserDao');
 const { Op } = require('sequelize');
-const sequelize = require('../../config/db');
+const sequelize = require('../config/db');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const secret = require('../config/authConfig');
 
 class UserController {
 
     rotas() {
-        return{
+        return {
             register: '/registerUser',
             login: '/login',
         }
     }
 
     registerUser() {
-        return(req, res) => {
-            const User = sequelize.models.User;
-            const userDao = new UserDao(User);
-            const err = [];
+        return (req, res) => {
+            const db = sequelize.models.User;
 
-            if (req.body.email !== req.body.reEmail) {
-                err.push('Emails diferentes');
-            }
+            db.findAll({
+                where: {
+                    [Op.or]: [
+                        { login: req.body.login },
+                        { email: req.body.email }
+                    ]
+                }
+            })
+                .then((value) => {
 
-            if (req.body.password !== req.body.rePassword) {
-                err.push('Senhas diferentes');
-            }
+                    if (value.length === 0) {
 
-            if (err.length === 0) {
-                User.findAll({
-                    where: {
-                        [Op.or]: [
-                            { login: req.body.login },
-                            { email: req.body.email }
-                        ]
-                    }
-                })
-                    .then((value) => {
+                        bcrypt.hash(req.body.password, 10)
+                            .then((hashPassword) => {
 
-                        value.forEach(element => {
-                            if (element.dataValues.login === req.body.login) {
-                                err.push('Login já cadastrado');
-                            }
+                                db.create({
+                                    name: req.body.name,
+                                    email: req.body.email,
+                                    login: req.body.login,
+                                    password: hashPassword,
+                                }).then((user) => {
+                                    user.password = undefined;
 
-                            if (element.dataValues.email === req.body.email) {
-                                err.push('Email já cadastrado');
-                            }
+                                    res.status(200).json({
+                                        user,
+                                        token: this.generateToken(user.id)
+                                    });
 
+                                }).catch((error) => {
+                                    res.status(400).json({ error });
+                                });
+
+                            })
+                            .catch((error) => {
+                                res.status(400).json({ error })
+                            });
+
+                    } else {
+
+                        let error = {
+                            email: undefined,
+                            login: undefined,
+                        };
+
+                        value.forEach(item => {
+                            if (req.body.email === item.email)
+                                error.email = "Já cadastrado";
+
+                            if (req.body.login === item.login)
+                                error.login = "já Cadastrado";
                         });
 
-                        if (err.length === 0) {
-                            userDao.register(req.body, res);
-                        } else {
-                            res.json(err);
-                        }
+                        res.status(400).json({ error });
 
-                    })
-                    .catch(() => {
-                        userDao.register(req.body, res);
-                    });
-            } else {
-                res.json(err);
-            }
+                    }
+
+                })
+                .catch((error) => {
+                    res.status(400).json({ error });
+                });
+
         }
     }
 
     login() {
-        return(req, res) => {
-            const User = sequelize.models.User;
-            const err = [];
+        return (req, res) => {
+            const db = sequelize.models.User;
 
-            User.findAll({
+            db.findOne({
                 where: {
-                    [Op.and]: [
-                        { login: req.body.login },
-                        { password: req.body.password }
-                    ]
+                    login: req.body.login
                 }
+            }).then((user) => {
+                if (!user) {
+                    res.status(200).json({ user });
+                } else {
+                    bcrypt.compare(req.body.password, user.password)
+                        .then((success) => {
+                            if (!success) {
+                                res.status(400).json({ error: "Usuário não cadastrado!" });
+                            } else {
+                                user.password = undefined;
+
+                                res.status(200).json({
+                                    user,
+                                    token: this.generateToken(user.id)
+                                });
+                            }
+                        })
+                        .catch((error) => {
+                            res.status(400).json({ error });
+                        })
+                }
+
+            }).catch((error) => {
+                res.status(400).json({ error });
             })
-            .then((value)=>{
-                res.status(200).json(value);
-            })
-            .catch((err)=>{
-                console.log(err);
-            });
         }
+    }
+
+    generateToken(id) {
+        return jwt.sign({ id: id }, secret(), { expiresIn: 604800, });
     }
 }
 

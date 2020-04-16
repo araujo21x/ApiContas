@@ -1,5 +1,5 @@
 const express = require('express');
-const routes = require('../src/routes/routes');
+const routes = require('../routes/routes');
 const sequelize = require('./db');
 const createTables = require('./tableConfig');
 const bodyParser = require('body-parser');

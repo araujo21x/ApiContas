@@ -1,9 +1,8 @@
-const UserController = require('../controller/UserController');
-const userController = new UserController;
 
-module.exports = (app)=>{
+const publicRoutes = require('./publicRoutes');
+const authRoutes = require('./authRoutes');
 
-    app.post(userController.rotas().register, userController.registerUser());
-    app.post(userController.rotas().login, userController.login());
-    
+module.exports = (app)=> {
+    publicRoutes(app);
+    authRoutes(app);
 }
