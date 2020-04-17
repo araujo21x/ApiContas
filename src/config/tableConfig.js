@@ -49,6 +49,10 @@ module.exports = () => {
             primaryKey: true,
             autoIncrement: true,
         },
+        typeUser:{
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         fkUser: {
             type: DataTypes.INTEGER,
             references: {
@@ -69,7 +73,7 @@ module.exports = () => {
         },
     });
 
-    const Account = sequelize.define('Account', {
+    const Expense = sequelize.define('Expense', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -109,6 +113,7 @@ module.exports = () => {
         },
         belongDate: {
             type: DataTypes.DATE,
+            allowNull: false,
         },
     })
 
