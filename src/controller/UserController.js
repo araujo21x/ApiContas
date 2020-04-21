@@ -12,6 +12,7 @@ class UserController {
         return {
             register: '/registerUser',
             login: '/login',
+            delete: '/deleteUser',
 
         }
     }
@@ -72,8 +73,8 @@ class UserController {
                     login: req.body.login
                 }
             }).then((user) => {
-                if (!user) {  
-                    res.status(200).json({ error:"login não errado!" });
+                if (!user) {
+                    res.status(200).json({ error: "login não errado!" });
                 } else {
 
                     bcrypt.compare(req.body.password, user.password)
@@ -99,6 +100,50 @@ class UserController {
                 res.status(400).json({ error });
             })
         }
+    }
+
+    deleteUser() {
+
+        return (req, res) => {
+            const db = sequelize.models.User;
+
+            console.log(req.userId);
+
+            db.destroy({
+                where: {
+                    id: req.userId,
+                }
+            })
+                .then(success => {
+                    res.status(200).json({ success, message: "Usuario apagado com sucesso" });
+                })
+                .catch(error => {
+                    res.status(400).json({ error, message: "Erro!!!" });
+                })
+
+
+        }
+
+    }
+
+    getUser(){
+        return(req, res) => {
+            const db = sequelize.models.User;
+
+            db.findOne({
+                where:{
+                    id: req.userId,
+                }
+            })
+                .then(user =>{
+                    console.log(user);
+                    res.status(200).json({user, message: "ususario encontrado com sucesso"});
+                })
+                .catch(error =>{
+                    res.status(400).json({error});
+                });
+        }
+        
     }
 
     generateToken(id) {

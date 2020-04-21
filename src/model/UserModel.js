@@ -16,7 +16,7 @@ class UserModel {
                     name: newUser.name,
                     email: newUser.email,
                     login: newUser.login,
-                    password: hashPassword,
+                    password: hashPassword
                 }).then((user) => {
                     user.password = undefined;
 

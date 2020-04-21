@@ -2,9 +2,8 @@ const UserController = require('../controller/UserController');
 const userControlle = new UserController();
 
 module.exports = (app) => {
-    userRoutes = userControlle.routes();
+    const userRoutes = userControlle.routes();
     
-    app.get('/', (req, res) => {
-        res.send({id: req.userId });
-    });
+    app.delete(userRoutes.delete , userControlle.deleteUser());
+
 }

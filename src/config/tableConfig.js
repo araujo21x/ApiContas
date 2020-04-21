@@ -24,9 +24,9 @@ module.exports = () => {
         password: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
+        }
     });
-
+    
     const Group = sequelize.define('Group', {
         id: {
             type: DataTypes.INTEGER,
@@ -68,8 +68,7 @@ module.exports = () => {
                 model: 'Groups',
                 key: 'id'
             },
-            onUpdate: 'cascade',
-            onDelete: 'cascade',
+            onUpdate: 'cascade'
         },
     });
 
@@ -85,8 +84,6 @@ module.exports = () => {
                 model: 'Users',
                 key: 'id'
             },
-            onUpdate: 'cascade',
-            onDelete: 'cascade',
         },
         fkgroup: {
             type: DataTypes.INTEGER,
