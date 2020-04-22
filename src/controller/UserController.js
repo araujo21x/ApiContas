@@ -12,15 +12,13 @@ class UserController {
         return {
             register: '/registerUser',
             login: '/login',
-            delete: '/deleteUser',
-
+            user: '/user',
         }
     }
 
     registerUser() {
         return (req, res) => {
-            const db = sequelize.models.User;
-
+            let db = sequelize.models.User;
             db.findAll({
                 where: {
                     [Op.or]: [
@@ -126,24 +124,25 @@ class UserController {
 
     }
 
-    getUser(){
-        return(req, res) => {
-            const db = sequelize.models.User;
+    getUser() {
+        return (req, res) => {
+            let db = sequelize.models.User;
+            let userModel = new UserModel(db);
+            let user = userModel.getUserDb(req.userId);
 
-            db.findOne({
-                where:{
-                    id: req.userId,
-                }
-            })
-                .then(user =>{
-                    console.log(user);
-                    res.status(200).json({user, message: "ususario encontrado com sucesso"});
-                })
-                .catch(error =>{
-                    res.status(400).json({error});
-                });
+            if (!user)
+                res.status(400).json({ sucesso: false, message: 'Erro ao encontrar usuário!' });
+
+            res.status(200).json({ user, sucesso: true, message: "Usuário encontrado!", });
         }
-        
+    }
+
+    editUser() {
+        return (req, res) => {
+            let db = sequelize.models.User;
+            let userModel = new UserModel(db);
+            let response = userModel.edit(req.userId, req.body);
+        }
     }
 
     generateToken(id) {

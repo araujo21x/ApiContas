@@ -6,4 +6,4 @@ module.exports = (app)=>{
 
     app.post(userRotas.register, userController.registerUser());
     app.post(userRotas.login, userController.login());
-}
+}       

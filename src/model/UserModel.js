@@ -6,6 +6,18 @@ class UserModel {
     constructor(db) {
         this.db = db;
     }
+    
+    async getUserDb(id) {
+
+        let user = await this.db.findOne({
+            where: { id: id }
+        });
+
+        if(!user)
+            return false;
+
+        return user;
+    }
 
     register(newUser, res) {
 
@@ -35,11 +47,22 @@ class UserModel {
             });
     
     }
-
+    
     generateToken(id) {
         return jwt.sign({ id: id }, secret(), { expiresIn: 604800, });
     }
 
+    async edit(id, newInfo){
+
+        let response = await this.db.update({...newInfo},{
+            where: {
+                id: id,
+            }
+        });
+
+        console.log(response[0]);
+
+    }
 }
 
 module.exports = UserModel;
