@@ -42,7 +42,7 @@ module.exports = () => {
             allowNull: false,
         },
     });
-
+    
     const UserAndGroup = sequelize.define('UserAndGroup', {
         id: {
             type: DataTypes.INTEGER,
@@ -85,15 +85,6 @@ module.exports = () => {
                 key: 'id'
             },
         },
-        fkgroup: {
-            type: DataTypes.INTEGER,
-            references: {
-                model: 'Groups',
-                key: 'id'
-            },
-            onUpdate: 'cascade',
-            onDelete: 'cascade',
-        },
         typeSpent: {
             type: DataTypes.STRING
         },
@@ -112,7 +103,34 @@ module.exports = () => {
             type: DataTypes.DATE,
             allowNull: false,
         },
-    })
+    });
+
+    const ExpenseAndGroup = sequelize.define('ExpenseAndGroup', { 
+        id:{
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        name:{
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        fkExpense:{
+            type: DataTypes.INTEGER,
+            references:{
+                model: 'Expenses',
+                key: 'id',
+            }
+        },
+        fkGroup:{
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'Groups',
+                key: 'id'
+            },
+            onDelete: 'cascade',
+        }
+    });
 
     sequelize.sync({ alter: true })
         .then((result) => {
