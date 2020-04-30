@@ -6,10 +6,11 @@ module.exports = (app) => {
 
     app.route(routes.group)
         .post(groupController.registerGroup())
-        .get(groupController.getGroup())
+        .get(groupController.getGroups())
         .delete(groupController.deleteGroup())
-        .put(groupController.updateUser());
+        .put(groupController.updateGroup());
 
+    app.delete(routes.exit, groupController.exitGroup());
     app.get(routes.getFilter, groupController.getFilterGroup());
 
 }

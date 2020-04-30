@@ -58,9 +58,7 @@ module.exports = () => {
             references: {
                 model: 'Users',
                 key: 'id'
-            },
-            onUpdate: 'cascade',
-            onDelete: 'cascade',
+            }
         },
         fkGroup: {
             type: DataTypes.INTEGER,
@@ -68,7 +66,8 @@ module.exports = () => {
                 model: 'Groups',
                 key: 'id'
             },
-            onUpdate: 'cascade'
+            onUpdate: 'cascade',
+            onDelete: 'cascade',
         },
     });
 
