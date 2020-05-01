@@ -100,6 +100,34 @@ class UserModel {
 
 
     }
+
+    getMultiUser(userSearch) {
+        return new Promise((resolve, reject) => {
+
+            let idsUsers = userSearch.map(element => { return element.fkUser });
+
+            this.db.findAll({
+                where: { id: idsUsers }
+            })
+                .then(users => {
+                    users.map(element => {
+                        element.password = undefined;
+
+                        userSearch.map(index =>{
+                            if(element.id === index.fkUser)
+                                element.dataValues.typeUser = index.typeUser;
+
+                        })
+                    });
+                    
+                    resolve(users);
+                })
+                .catch(error => {
+                    let newError = { error, success: false, message: `erro ao retornar usuarios` }
+                    reject(newError);
+                })
+        })
+    }
 }
 
 module.exports = UserModel;

@@ -1,12 +1,17 @@
 const sequelize = require('../config/db');
+
 const { Op } = require('sequelize');
+
 const UserGroupController = require('./UserGroupController');
+const UserModel = require('../model/UserModel');
+
 class GroupController {
     routes() {
         return {
             group: '/group',
             getFilter: '/groupFilter',
-            exit: `/exitGroup`
+            exit: `/exitGroup`,
+            userGroup: `/userGroup`,
         }
     }
 
@@ -21,7 +26,7 @@ class GroupController {
 
                         let userGroupController = new UserGroupController;
 
-                        userGroupController.register(req.userId, group.id)
+                        userGroupController.register(req.userId, group.id, "ADM")
                             .then(idSearch => {
                                 this.searchGroups(idSearch, db)
                                     .then(groups => {
@@ -125,14 +130,14 @@ class GroupController {
                             }
                         })
                         .then(response => {
-                            if(response[0] == 0){
-                                res.status(400).json({success:false, message:` Erro ao fazer update no banco`});
-                            }else{
-                                res.status(200).json({success:true, message: `Grupo modificado!`});
+                            if (response[0] == 0) {
+                                res.status(400).json({ success: false, message: ` Erro ao fazer update no banco` });
+                            } else {
+                                res.status(200).json({ success: true, message: `Grupo modificado!` });
                             }
                         })
                         .catch(error => {
-                            res.status(400).json({error,success:false, message:` Erro ao fazer update no banco`});
+                            res.status(400).json({ error, success: false, message: ` Erro ao fazer update no banco` });
                         })
                 })
                 .catch(error => {
@@ -147,13 +152,95 @@ class GroupController {
         }
     }
 
+    addMember() {
+        return (req, res) => {
+            this.permisioUser(req.userId, req.body.idGroup)
+                .then(() => {
+                    let userGroupController = new UserGroupController;
+
+                    userGroupController.register(req.body.idUser, req.body.idGroup, "BASIC")
+                        .then(userSearch => {
+                            let db = sequelize.models.User;
+                            let userModel = new UserModel(db);
+
+                            userModel.getMultiUser(userSearch)
+                                .then(users => {
+                                    res.status(200).json(users);
+                                })
+                                .catch(error => {
+                                    res.status(400).json(error);
+                                })
+
+                        })
+                        .catch(error => {
+                            res.status(400).json({ error });
+                        })
+                })
+                .catch(error => {
+                    res.status(400).json(error);
+                })
+        }
+    }
+
+    getMemberForGroup() {
+        return (req, res) => {
+            let userGroupController = new UserGroupController;
+
+            userGroupController.getUsersForGroup(req.body.idGroup)
+                .then(userSearch => {
+                    let db = sequelize.models.User;
+                    let userModel = new UserModel(db);
+
+                    userModel.getMultiUser(userSearch)
+                        .then(users => {
+                            res.status(200).json(users);
+                        })
+                        .catch(error => {
+                            res.status(400).json(error);
+                        })
+                })
+                .catch(error => {
+                    res.status(400).json(error);
+                })
+        }
+    }
+
+    editMemberForGroup() {
+        return (req, res) => {
+            this.permisioUser(req.userId, req.body.idGroup)
+                .then(() => {
+                    let userGroupController = new UserGroupController;
+
+                    userGroupController.modifyUserforGroup(req.body.idUser, req.body.idGroup, req.body.typeUser)
+                        .then(response => { res.status(200).json(response) })
+                        .catch(error => { res.status(400).json(error) });
+                })
+                .catch(error => {
+                    res.status(400).json(error);
+                })
+        }
+    }
+
+    deleteMemberForGroup() {
+        return (req, res) => {
+            this.permisioUser(req.userId, req.body.idGroup)
+                .then(() => {
+                    let userGroupController = new UserGroupController;
+                    userGroupController.deleteGroupsAndUser(req.body.idUser, req.body.idGroup)
+                        .then(response => { this.getMemberForGroup()(req, res) })
+                        .catch(error => { res.status(400).json(error) });
+                })
+                .catch(error => {
+                    res.status(400).json(error);
+                })
+        }
+    }
+
     searchGroups(idSearch, db) {
         return new Promise((resolve, reject) => {
 
             db.findAll({
-                where: {
-                    id: idSearch
-                }
+                where: { id: idSearch }
             })
                 .then(groups => {
                     resolve(groups);
@@ -201,6 +288,7 @@ class GroupController {
                 })
         });
     }
+
 }
 
 module.exports = GroupController;
