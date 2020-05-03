@@ -84,22 +84,33 @@ module.exports = () => {
                 key: 'id'
             },
         },
+        fkExpenseAndGroup: {
+            type: DataTypes.INTEGER,
+            references: {
+                model: 'ExpenseAndGroups',
+                key: 'id'
+            },
+        },
+        debtors:{
+            type: DataTypes.ARRAY(DataTypes.INTEGER),
+            allowNull: false,
+        },
         typeSpent: {
             type: DataTypes.STRING
         },
-        value: {
+        amount: {
+            type: DataTypes.FLOAT,
+            allowNull: false,
+        },
+        valueIndividual : {
             type: DataTypes.FLOAT,
             allowNull: false,
         },
         description: {
             type: DataTypes.STRING,
         },
-        dateRegistry: {
-            type: DataTypes.DATE,
-            allowNull: false,
-        },
         belongDate: {
-            type: DataTypes.DATE,
+            type: DataTypes.STRING,
             allowNull: false,
         },
     });
@@ -113,13 +124,6 @@ module.exports = () => {
         name:{
             type: DataTypes.STRING,
             allowNull: false,
-        },
-        fkExpense:{
-            type: DataTypes.INTEGER,
-            references:{
-                model: 'Expenses',
-                key: 'id',
-            }
         },
         fkGroup:{
             type: DataTypes.INTEGER,
