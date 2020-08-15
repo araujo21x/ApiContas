@@ -86,7 +86,6 @@ class UserGroupController {
     deleteGroupsAndUser(userId, groupId) {
         return new Promise((resolve, reject) => {
             let db = sequelize.models.UserAndGroup;
-
             db.destroy({
                 where: {
                     [Op.and]: [

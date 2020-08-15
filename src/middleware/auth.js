@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
 
     const partsToken = authHeader.split(' ');
 
-    if (!partsToken.lenght === 2)
+    if (!partsToken.length === 2)
         return res.status(401).send({ error: "Token error" });
 
     const [scheme, token] = partsToken;
