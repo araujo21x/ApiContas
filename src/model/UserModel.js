@@ -16,6 +16,7 @@ class UserModel {
         if (!user)
             return false;
 
+        user.password = undefined;
         return user;
     }
 
@@ -64,7 +65,7 @@ class UserModel {
                         }).then(response => {
 
                             if (response[0] == 0) {
-                                reject("Erro ao modicar Usuario no banco")
+                                reject("Erro ao modificar Usuario no banco")
                             } else {
                                 this.db.findOne({
                                     where: { id: id }
