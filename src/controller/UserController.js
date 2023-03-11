@@ -123,13 +123,16 @@ class UserController {
     getUser() {
         return (req, res) => {
             let db = sequelize.models.User;
-            let userModel = new UserModel(db);
+            const userModel = new UserModel(db);
             let user = userModel.getUserDb(req.userId);
-
-            if (!user)
+            
+            user.then((value)=>{
+                res.status(200).json({ user: value, sucesso: true, message: "Usuário encontrado!", });
+            })
+            .catch((err) => {
                 res.status(400).json({ sucesso: false, message: 'Erro ao encontrar usuário!' });
+            });
 
-            res.status(200).json({ user, sucesso: true, message: "Usuário encontrado!", });
         }
     }
 
